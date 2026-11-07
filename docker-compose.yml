@@ -1,0 +1,56 @@
+services:
+  auth-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: taskflow
+      POSTGRES_PASSWORD: taskflow_dev
+    ports: ["5433:5432"]
+    volumes: [auth_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskflow -d authdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  task-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: taskflow
+      POSTGRES_PASSWORD: taskflow_dev
+    ports: ["5434:5432"]
+    volumes: [task_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskflow -d taskdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  auth-service:
+    build: ./auth-service
+    environment:
+      AUTH_DB_URL: jdbc:postgresql://auth-db:5432/authdb
+      AUTH_DB_USER: taskflow
+      AUTH_DB_PASSWORD: taskflow_dev
+      JWT_SECRET: change-this-development-secret-to-a-long-random-value
+    ports: ["8081:8081"]
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  task-service:
+    build: ./task-service
+    environment:
+      TASK_DB_URL: jdbc:postgresql://task-db:5432/taskdb
+      TASK_DB_USER: taskflow
+      TASK_DB_PASSWORD: taskflow_dev
+      JWT_SECRET: change-this-development-secret-to-a-long-random-value
+    ports: ["8082:8082"]
+    depends_on:
+      task-db:
+        condition: service_healthy
+
+volumes:
+  auth_data:
+  task_data:

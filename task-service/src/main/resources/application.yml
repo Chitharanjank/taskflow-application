@@ -1,0 +1,16 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: task-service
+  datasource:
+    url: ${TASK_DB_URL:jdbc:postgresql://localhost:5434/taskdb}
+    username: ${TASK_DB_USER:taskflow}
+    password: ${TASK_DB_PASSWORD:taskflow_dev}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-this-development-secret-to-a-long-random-value}
