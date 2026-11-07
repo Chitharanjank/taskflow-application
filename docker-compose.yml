@@ -51,6 +51,13 @@ services:
       task-db:
         condition: service_healthy
 
+  frontend:
+    build: ./frontend
+    ports: ["3000:80"]
+    depends_on:
+      - auth-service
+      - task-service
+
 volumes:
   auth_data:
   task_data:

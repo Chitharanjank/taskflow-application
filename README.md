@@ -1,83 +1,96 @@
-# TaskFlow – Java Microservices Task Tracker
+# TaskFlow – Full-stack microservices starter
 
-A starter Jira-like task management backend with two Spring Boot microservices.
+TaskFlow is a small task management application with a browser UI, two Java/Spring Boot REST microservices, and two PostgreSQL databases.
 
-## Services
-- `auth-service` (8081): registration, login, JWT issuance, current user
-- `task-service` (8082): authenticated task CRUD, task status and priority
+## Architecture
 
-Each service has its own PostgreSQL database. Task Service validates JWTs using the same `JWT_SECRET` as Auth Service.
+- **Frontend:** React + Vite, served by Nginx on port `3000`.
+- **Auth Service:** Java 21 + Spring Boot on port `8081`; registration, login, BCrypt password hashing, JWT generation.
+- **Task Service:** Java 21 + Spring Boot on port `8082`; authenticated task CRUD and per-user task ownership.
+- **auth-db / task-db:** separate PostgreSQL 16 databases.
 
-## Requirements
-- Java 21
-- Maven 3.9+
-- Docker + Docker Compose
+The frontend is an application component, not a microservice. There are two Java microservices plus the frontend UI. Nginx serves the UI and reverse-proxies `/api/auth/*` and `/api/tasks*` to the backend containers, so browser requests use the same origin and no CORS configuration is needed.
 
 ## Run with Docker Compose
+
+Requirements: Docker Engine/Desktop with the Compose plugin.
+
+From the project root:
+
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
-## Run locally
-Start PostgreSQL databases first (or use Docker Compose and comment out the two application services).
-```bash
-cd auth-service && mvn spring-boot:run
-cd task-service && mvn spring-boot:run
+Open the browser:
+
+```text
+http://localhost:3000
 ```
 
-## API quick start
+Choose **Create account**, register with your name/email/password, then sign in. The JWT is stored and attached to API requests automatically by the frontend; users do not need to copy or paste it.
 
-Register:
+Useful commands:
+
 ```bash
-curl -X POST http://localhost:8081/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Demo User","email":"demo@example.com","password":"Password123!"}'
+docker compose ps
+docker compose logs -f frontend auth-service task-service
+docker compose down
 ```
 
-Login:
-```bash
-curl -X POST http://localhost:8081/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"demo@example.com","password":"Password123!"}'
-```
-Copy the `token` from the response.
+To remove the containers AND development database data (this deletes registered users and tasks):
 
-Create a task:
 ```bash
-curl -X POST http://localhost:8082/api/tasks \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Deploy TaskFlow to EKS","description":"Build CI/CD pipeline","priority":"HIGH","status":"TODO"}'
+docker compose down -v
 ```
 
-List your tasks:
-```bash
-curl http://localhost:8082/api/tasks -H "Authorization: Bearer YOUR_TOKEN"
+## Features
+
+- Register and sign in from a normal browser form.
+- Dashboard with total, to-do, in-progress and completed task counts.
+- Create, edit and delete tasks.
+- Change task status from the task list.
+- Priority levels: LOW, MEDIUM, HIGH.
+- Search tasks and filter by status.
+- Tasks are scoped to the authenticated user by the Task Service.
+
+## API routes
+
+Auth Service:
+
+- `POST /api/auth/register` – `{ "name": "Demo User", "email": "demo@example.com", "password": "Password123!" }`
+- `POST /api/auth/login` – `{ "email": "demo@example.com", "password": "Password123!" }`
+
+Task Service (requires `Authorization: Bearer <JWT>`):
+
+- `GET /api/tasks`
+- `POST /api/tasks` – `{ "title": "Deploy app", "description": "Deploy to test", "priority": "HIGH", "status": "TODO" }`
+- `GET /api/tasks/{id}`
+- `PUT /api/tasks/{id}`
+- `DELETE /api/tasks/{id}`
+
+## Ports
+
+| Component | Host port |
+|---|---:|
+| TaskFlow UI (Nginx) | 3000 |
+| Auth Service | 8081 |
+| Task Service | 8082 |
+| Auth PostgreSQL | 5433 |
+| Task PostgreSQL | 5434 |
+
+## Important development notes
+
+- This is a learning/demo starter. The Compose credentials and JWT secret are development values; replace them with strong secrets before any shared or production deployment.
+- For production, prefer short-lived access tokens and secure HttpOnly, SameSite cookies (or another carefully designed token-storage approach), HTTPS, rate limiting, audit logging, input validation, and managed secrets.
+- The UI currently uses browser localStorage for the JWT to keep this starter straightforward. Do not treat that as the ideal production security design.
+- The frontend uses the API response shape from the included Auth Service (`{ token, tokenType, user }`) and the Task Service task fields (`id`, `title`, `description`, `priority`, `status`).
+
+## Project structure
+
+```text
+.
+├── auth-service/       # Java/Spring Boot authentication service
+├── task-service/       # Java/Spring Boot task service
+├── frontend/           # React UI + Nginx reverse proxy
+└── docker-compose.yml  # frontend, 2 services, 2 PostgreSQL databases
 ```
-
-## Main endpoints
-
-### Auth Service
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/auth/register` | Register user |
-| POST | `/api/auth/login` | Login and receive JWT |
-
-### Task Service
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/tasks` | Create task |
-| GET | `/api/tasks` | List tasks owned by current user |
-| GET | `/api/tasks/{id}` | Get one task |
-| PUT | `/api/tasks/{id}` | Update task |
-| DELETE | `/api/tasks/{id}` | Delete task |
-
-Task status: `TODO`, `IN_PROGRESS`, `DONE`  
-Priority: `LOW`, `MEDIUM`, `HIGH`
-
-## Environment variables
-- `JWT_SECRET`: shared secret, at least 32 characters
-- `AUTH_DB_URL`, `AUTH_DB_USER`, `AUTH_DB_PASSWORD`
-- `TASK_DB_URL`, `TASK_DB_USER`, `TASK_DB_PASSWORD`
-
-**Security note:** This is a learning starter, not production-hardened. Replace the development JWT secret, use HTTPS, add migrations (Flyway), validation/rate limiting, refresh-token rotation, centralized secrets, tests, and stricter CORS before production.
