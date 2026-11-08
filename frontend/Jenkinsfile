@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment{
-    DOCKERHUB_REPO= "chitharanjank/taskflow-app-frontend"
+    DOCKERHUB_REPO = "chitharanjank/taskflow-app-frontend"
   }
   
   stages {
@@ -20,7 +20,7 @@ pipeline {
         steps {
           sh '''
             cd frontend
-            docker build -t chitharanjank/taskflow-app-frontend:${env.GIT_COMMIT} .
+            docker build -t $DOCKERHUB_REPO:${env.GIT_COMMIT} .
           '''
    }
 }
