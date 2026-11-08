@@ -11,7 +11,7 @@ pipeline {
             steps {
               sh '''
               cd auth-service
-              docker run --rm   --network host   -e SONAR_HOST_URL="http://localhost:9000"   -e SONAR_TOKEN="sqa_506fc43b02a4fac39f8b72e394d8a6f58d028c3d"   -v "$(pwd):/usr/src"   sonarsource/sonar-scanner-cli
+              docker run --rm   --network host   -e SONAR_HOST_URL="http://localhost:9000"   -e SONAR_TOKEN="sqa_506fc43b02a4fac39f8b72e394d8a6f58d028c3d" -e SONAR_USER_HOME="/tmp/sonar"  -v "$(pwd):/usr/src"   sonarsource/sonar-scanner-cli
               '''
             }
         }
@@ -19,8 +19,7 @@ pipeline {
         stage ('maven compile, test, package') {
             steps {
                 sh '''
-                chown -R jenkins:jenkins task-service
-                cd auth-service
+                cd auth-ervice
                 mvn clean package
                 '''
             }
