@@ -19,7 +19,7 @@ pipeline {
         stage ('maven compile, test, package') {
             steps {
                 sh '''
-                cd auth-ervice
+                cd auth-service
                 mvn clean package
                 '''
             }
