@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'maven-3.9.0'
+    }
+    
     stages {
         stage ('Code Quality test') {
             steps {
@@ -8,6 +12,14 @@ pipeline {
               cd task-service
               docker run --rm   --network host   -e SONAR_HOST_URL="http://localhost:9000"   -e SONAR_TOKEN="sqa_506fc43b02a4fac39f8b72e394d8a6f58d028c3d"   -v "$(pwd):/usr/src"   sonarsource/sonar-scanner-cli
               '''
+            }
+        }
+
+        stage ('maven compile, test, package') {
+            steps {
+                sh '''
+                mvn clean package
+                '''
             }
         }
     }
