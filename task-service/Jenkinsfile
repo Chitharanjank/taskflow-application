@@ -7,24 +7,11 @@ pipeline {
     }
 
     stages {
-        stage('Check Java Version') {
-           steps {
-                sh '''
-                echo "JAVA_HOME=$JAVA_HOME"
-                echo "Java version:"
-                java -version
-        
-                echo "Maven Java version:"
-                mvn -version
-                '''
-          }
-       }
-    
         stage ('Code Quality test') {
             steps {
               sh '''
               cd task-service
-              docker run --rm   --network host --user "$(id -u):$(id -g)"   -e SONAR_HOST_URL="http://localhost:9000"   -e SONAR_TOKEN="sqa_506fc43b02a4fac39f8b72e394d8a6f58d028c3d" -e SONAR_USER_HOME="/tmp/sonar"  -v "$(pwd):/usr/src"   sonarsource/sonar-scanner-cli -Dsonar.working.directory=/usr/src/.scannerwork
+              docker run --rm   --network host   -e SONAR_HOST_URL="http://localhost:9000"   -e SONAR_TOKEN="sqa_506fc43b02a4fac39f8b72e394d8a6f58d028c3d" -e SONAR_USER_HOME="/tmp/sonar"  -v "$(pwd):/usr/src"   sonarsource/sonar-scanner-cli
               '''
             }
         }
