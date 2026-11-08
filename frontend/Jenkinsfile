@@ -18,10 +18,10 @@ pipeline {
 
       stage ('create Docker Image') {
         steps {
-          sh '''
+          sh """
             cd frontend
             docker build -t $DOCKERHUB_REPO:${env.GIT_COMMIT} .
-          '''
+           """
           }
       }
   }
