@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDS = credentials('Dockerhubcredential')
-        DOCKERHUB_REPO = taskflow-app-auth-service
+        DOCKERHUB_REPO = "taskflow-app-auth-service"
     }
 
     stages {
