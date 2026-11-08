@@ -33,6 +33,7 @@ pipeline {
         stage ('Build docker image') {
             steps {
                 sh """
+                   cd auth-service
                    docker build -t ${env.DOCKERHUB_CREDS_USR}/${env.DOCKERHUB_REPO}:${env.GIT_COMMIT} .
                 """
            }
