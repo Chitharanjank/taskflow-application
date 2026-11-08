@@ -7,6 +7,8 @@ pipeline {
   
   environment{
      sonarqube_token = credentials('SonarQube-Token')
+     DOCKERHUB_CREDS = credential('DockerHub_cred')
+     DOCKERHUB_REPO = "taskflow-app-auth-service"
   }
   
   stages {
@@ -28,5 +30,14 @@ pipeline {
         '''
       }
     }
+
+    stage ('Build docker image') {
+       steps {
+          sh """
+             cd auth-service
+             docker build -t ${env.DOCKERHUB_CREDS_USR}/${env.DOCKERHUB_REPO}:${env.GIT_COMMIT} .
+          """
+           }
+        }
   }
 }
