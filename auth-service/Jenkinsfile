@@ -15,6 +15,14 @@ pipeline {
            '''
         }
      }
-   }
-}
 
+    stage ('test and build') {
+      steps {
+        sh '''
+           cd auth-service
+           mvn clean package
+        '''
+      }
+    }
+  }
+}
