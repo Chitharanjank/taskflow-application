@@ -10,6 +10,7 @@ pipeline {
         steps {
            sh '''
              echo "Sonarqube testing"
+             cd auth-service
              docker run --rm   --network host   -e SONAR_HOST_URL="http://localhost:9000"   -e SONAR_TOKEN="$sonarqube_token" -e SONAR_USER_HOME="/tmp/sonar"  -v "$(pwd):/usr/src"   sonarsource/sonar-scanner-cli
            '''
         }
