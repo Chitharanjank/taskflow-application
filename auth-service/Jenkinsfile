@@ -4,7 +4,7 @@ pipeline {
   stages {
      stage ('SonarQube Analysis') {
         steps {
-           sh ...
+           sh '''
              echo "Sonarqube testing"
            '''
         }
