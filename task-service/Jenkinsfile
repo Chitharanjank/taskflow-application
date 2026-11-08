@@ -1,0 +1,11 @@
+pipeline {
+    agent any
+
+    stages {
+        stage ('Code Quality test') {
+            steps {
+              echo "testing code quality"
+            }
+        }
+    }
+}
