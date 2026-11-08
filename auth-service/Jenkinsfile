@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+  tools {
+    jdk 'temurin-21'
+  }
+  
   environment{
      sonarqube_token = credentials('SonarQube-Token')
   }
