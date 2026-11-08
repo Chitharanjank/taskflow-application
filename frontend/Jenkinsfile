@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+  environment{
+    DOCKERHUB_REPO= "chitharanjank/taskflow-app-frontend"
+  }
+  
   stages {
       stage ('build') {
          steps {
@@ -11,5 +15,12 @@ pipeline {
            '''
          }
       }
+
+      stage ('create Docker Image') {
+        steps {
+          sh '''
+            cd frontend
+            docker build -t chitharanjank/taskflow-app-frontend:${env.GIT_COMMIT} .
+          '''
    }
 }
