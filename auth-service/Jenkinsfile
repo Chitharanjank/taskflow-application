@@ -19,7 +19,6 @@ pipeline {
     stage ('test and build') {
       steps {
         sh '''
-           sudo chown -R jenkins:jenkins auth-service
            cd auth-service
            mvn clean package
         '''
