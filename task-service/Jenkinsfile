@@ -6,6 +6,11 @@ pipeline {
         jdk 'temurin-21'
     }
 
+    environment {
+        DOCKERHUB_CREDS = credentials('Dockerhubcredential')
+        DOCKERHUB_REPO = "taskflow-app-task-service"
+    }
+    
     stages {
         stage ('Code Quality test') {
             steps {
@@ -22,6 +27,14 @@ pipeline {
                 cd task-service
                 mvn clean package
                 '''
+            }
+        }
+
+        stage ('Build Docker Image') {
+            steps {
+                sh """
+                   docker build -t ${env.DOCKERHUB_CREDS_USR}:${env.DOCKERHUB_REPO}:${env.GIT_COMMIT} .
+                """
             }
         }
     }
