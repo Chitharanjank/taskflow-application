@@ -4,10 +4,10 @@ pipeline {
   stages {
      stage ('SonarQube Analysis') {
         steps {
-           sh '''
+           sh """
              echo "Sonarqube testing"
              docker run --rm   --network host   -e SONAR_HOST_URL="http://localhost:9000"   -e SONAR_TOKEN="$SonarQube-Token" -e SONAR_USER_HOME="/tmp/sonar"  -v "$(pwd):/usr/src"   sonarsource/sonar-scanner-cli
-           '''
+           """
         }
      }
    }
