@@ -34,7 +34,7 @@ pipeline {
             steps {
                 sh """
                    cd task-service
-                   docker build -t ${env.DOCKERHUB_CREDS_USR}:${env.DOCKERHUB_REPO}:${env.GIT_COMMIT} .
+                   docker build -t ${env.DOCKERHUB_CREDS_USR}/${env.DOCKERHUB_REPO}:${env.GIT_COMMIT} .
                 """
             }
         }
