@@ -28,11 +28,11 @@ pipeline {
 
       stage ('Push to DockerHub') {
         steps {
-          sh '''
+          sh """
             echo "Logging into Docker Hub and pushing image..."
-            echo \$DOCKERHUB_CREDS_PSW | docker login -u \$DOCKERHUB_CREDS_USR --password-stdin"
+            echo "\$DOCKERHUB_CREDS_PSW | docker login -u \$DOCKERHUB_CREDS_USR --password-stdin"
             docker push $DOCKERHUB_REPO:${env.GIT_COMMIT}"
-            '''
+            """
         }
       }
   }
