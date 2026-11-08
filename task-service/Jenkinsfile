@@ -18,6 +18,7 @@ pipeline {
         stage ('maven compile, test, package') {
             steps {
                 sh '''
+                cd task-service
                 mvn clean package
                 '''
             }
