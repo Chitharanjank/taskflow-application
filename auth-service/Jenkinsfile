@@ -7,7 +7,7 @@ pipeline {
   
   environment{
      sonarqube_token = credentials('SonarQube-Token')
-     DOCKERHUB_CREDS = credential('DockerHub_cred')
+     DOCKERHUB_CREDS = credentials('DockerHub_cred')
      DOCKERHUB_REPO = "taskflow-app-auth-service"
   }
   
