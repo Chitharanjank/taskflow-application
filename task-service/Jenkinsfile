@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh '''
                 cd task-service
-                mvn clean package
+                mvn package
                 '''
             }
         }
