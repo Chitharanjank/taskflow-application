@@ -6,6 +6,11 @@ pipeline {
         jdk 'temurin-21'
     }
 
+    environment {
+        DOCKERHUB_CREDS = credentials('Dockerhubcredential')
+        DOCKERHUB_REPO = taskflow-app-auth-service
+    }
+
     stages {
         stage ('Code Quality test') {
             steps {
@@ -22,6 +27,24 @@ pipeline {
                 cd auth-service
                 mvn clean package
                 '''
+            }
+        }
+
+        stage ('Build docker image') {
+            steps {
+                sh """
+                   docker build -t ${env.DOCKERHUB_CREDS_USR}/${env.DOCKERHUB_REPO}:${env.GIT_COMMIT} .
+                """
+           }
+        }
+
+        stage ('Push to DockerHub') {
+            steps {
+                sh """
+                    echo "Logging into Docker Hub and pushing image..."
+                    echo \$DOCKERHUB_CREDS_PSW | docker login -u \$DOCKERHUB_CREDS_USR --password-stdin
+                    docker push ${env.DOCKERHUB_CREDS_USR}/${env.DOCKERHUB_REPO}:${env.GIT_COMMIT}
+                """
             }
         }
     }
